@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>eSIM — интерактивный прототип</title>
+  <style>
+    :root{
+      --bg:#F6F6F8;
+      --card:#FFFFFF;
+      --text:#111118;
+      --muted:#7A7A86;
+      --stroke:#E7E7EF;
+      --accent:#7B4DFF;
+      --accent2:#B19CFF;
+      --good:#18B36B;
+      --bad:#EB2222;
+      --shadow: 0 12px 30px rgba(16,16,24,.08);
+      --radius-xl: 22px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-sm: 12px;
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:#111118;color:var(--text)}
+    a{color:inherit}
+    button{font:inherit}
+    button, .svc, .tab, .op, .planCard, .item, .qa, .heroBtn, .btnGhost, .btnNext, .btnPrimary{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+
+    .stage{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+    .phone{
+      width:390px; max-width:100%;
+      height:820px; max-height:92vh;
+      background:var(--bg);
+      border-radius:34px;
+      overflow:hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,.35);
+      position:relative;
+    }
+    .statusbar{
+      height: 26px;
+      padding: calc(10px + var(--safe-top)) 18px 0;
+      display:flex;align-items:center;justify-content:space-between;
+      color:#2B2B33;font-weight:600;font-size:13px;
+      opacity:.85;
+    }
+    .statusbar .icons{display:flex;gap:8px;align-items:center;font-weight:700;}
+    .app{height: calc(100% - 26px);display:flex;flex-direction:column;padding-bottom: calc(74px + var(--safe-bottom));}
+    .topHeader{padding: 10px 18px 0;display:flex; align-items:center; justify-content:space-between;}
+    .email{font-size:15px;color:#2B2B33;opacity:.8;max-width: 290px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .avatar{width:28px;height:28px;border-radius:999px;background: rgba(123,77,255,.15);display:flex;align-items:center;justify-content:center;color: var(--accent); font-weight:800;border:1px solid rgba(123,77,255,.2);}
+
+    .quickActions{padding: 14px 18px 6px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+    .qa{
+      background: linear-gradient(135deg, rgba(123,77,255,.85), rgba(177,156,255,.9));
+      border-radius: 20px;
+      padding: 14px 14px 12px;
+      min-height: 86px;
+      color:#fff;
+      position:relative;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.22);
+      cursor: default;
+    }
+    .qa .ico{position:absolute; right:10px; top:10px;width:44px;height:44px;border-radius:16px;background: rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;line-height:1;}
+    .qa .lbl{margin-top: 36px; font-weight:700; font-size:14px; line-height:1.15}
+    .qa.secondary{background: linear-gradient(135deg, rgba(123,77,255,.72), rgba(177,156,255,.74))}
+    .qa.tertiary{background: linear-gradient(135deg, rgba(123,77,255,.62), rgba(177,156,255,.66))}
+
+    .content{padding: 10px 18px 0;overflow:auto;-webkit-overflow-scrolling: touch;flex:1;}
+    .sectionTitle{font-size:26px;font-weight:900;margin: 18px 0 10px;letter-spacing:-.3px;}
+
+    .assetsRow{display:grid; grid-template-columns: repeat(3, 1fr);gap:10px;}
+    .assetCard{background:var(--card);border:1px solid var(--stroke);border-radius: var(--radius-lg);padding: 14px 12px;min-height: 92px;display:flex;flex-direction:column;gap:10px;}
+    .assetTop{display:flex;align-items:center;justify-content:space-between}
+    .coin{width:34px;height:34px;border-radius:999px;background: rgba(123,77,255,.14);border:1px solid rgba(123,77,255,.18);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--accent);}
+    .assetAmt{font-weight:900;font-size:18px}
+    .assetCur{color:var(--muted);font-weight:700;margin-top:-4px}
+    .chip{font-size:11px;font-weight:800;padding:4px 8px;border-radius:999px;border:1px solid var(--stroke);background:#fff;color:#545460;}
+
+    .banner{margin-top: 14px;border-radius: 20px;min-height: 112px;padding: 16px;background: linear-gradient(135deg, rgba(123,77,255,.92), rgba(177,156,255,.92));color:#fff;position:relative;overflow:hidden;}
+    .banner .tag{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background: rgba(255,255,255,.22);font-weight:800;font-size:12px;}
+    .banner .h{margin-top: 10px;font-size:22px;font-weight:900;}
+    .banner .p{margin-top:6px;opacity:.9;font-weight:700}
+    .dots{display:flex;gap:6px;justify-content:center;margin:10px 0 2px;}
+    .dot{width:7px;height:7px;border-radius:999px;background:#D1D1DE}
+    .dot.active{background:#7E7E92}
+
+    .listCard{background:var(--card);border:1px solid var(--stroke);border-radius: var(--radius-xl);padding: 14px;}
+    .row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+    .servicesGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+    .svc{
+      background:var(--card);
+      border:1px solid var(--stroke);
+      border-radius: 18px;
+      padding: 12px;
+      min-height: 98px;
+      display:flex;flex-direction:column;justify-content:flex-start;
+      position:relative;
+      cursor:pointer;
+      transition: transform .05s ease;
+      user-select:none;
+    }
+    .svc:active{transform: scale(.99)}
+    .svc .ico{width:34px;height:34px;border-radius:12px;background: rgba(123,77,255,.12);border:1px solid rgba(123,77,255,.18);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:900;margin-bottom:10px;}
+    .svc .name{font-weight:900;line-height:1.15}
+    .badgeNew{position:absolute;top:10px;left:10px;background:#FF3B30;color:#fff;font-weight:900;font-size:11px;padding:3px 8px;border-radius:999px;}
+
+    .opsHeader{display:flex;align-items:flex-end;justify-content:space-between;margin-top: 18px;}
+    .opsHeader .date{color:var(--muted);font-weight:800}
+    .op{display:flex;align-items:center;gap:12px;padding: 12px 0;cursor:pointer;}
+    .op + .op{border-top:1px solid var(--stroke)}
+    .op .opIco{width:44px;height:44px;border-radius: 16px;background: rgba(123,77,255,.12);border:1px solid rgba(123,77,255,.18);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:900;position:relative;flex:0 0 auto;}
+    .op .opIco .mini{position:absolute; left:-6px; top:-6px;width:22px;height:22px;border-radius:999px;background: #2EA8FF;border:2px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:900;}
+    .opMain{flex:1; min-width:0}
+    .opTitle{font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .opSub{color:var(--muted);font-weight:800;font-size:13px;display:flex;gap:8px;align-items:center}
+    .opAmt{font-weight:900;white-space:nowrap}
+    .opAmt.good{color:var(--good)}
+    .opAmt.bad{color:var(--bad)}
+
+    .tabbar{position:absolute; left:0; right:0; bottom:0;padding: 10px 14px calc(12px + var(--safe-bottom));background: rgba(246,246,248,.92);backdrop-filter: blur(14px);border-top: 1px solid rgba(231,231,239,.85);display:flex;justify-content:space-around;gap:8px;z-index:10;}
+    .tab{width:78px;display:flex;flex-direction:column;align-items:center;gap:6px;color:#9A9AAC;font-weight:800;font-size:12px;cursor:pointer;user-select:none;}
+    .tab .tIco{width:32px;height:32px;border-radius: 12px;display:flex;align-items:center;justify-content:center;border:1px solid transparent;}
+    .tab.active{color: var(--text)}
+    .tab.active .tIco{border-color: rgba(123,77,255,.28);background: rgba(123,77,255,.12);color: var(--accent);}
+
+    /* Overlay + Bottom sheet */
+    .overlay{position:absolute;inset:0;background: rgba(17,17,24,.42);opacity:0; pointer-events:none;transition: opacity .18s ease;z-index: 20;}
+    .overlay.show{opacity:1; pointer-events:auto}
+    .sheet{position:absolute;left:0;right:0;bottom:0;background: var(--card);border-top-left-radius: 26px;border-top-right-radius: 26px;transform: translateY(105%);transition: transform .22s cubic-bezier(.2,.8,.2,1);z-index: 25;box-shadow: var(--shadow);max-height: 84%;display:flex;flex-direction:column;overflow:hidden;}
+    .sheet.show{transform: translateY(0)}
+    .grabber{width:44px;height:5px;border-radius:999px;background:#D7D7E3;margin:10px auto 2px;}
+    .sheetHeader{padding: 8px 18px 10px;display:flex;align-items:center;justify-content:space-between;}
+    .sheetHeader h3{margin:0;font-size:22px;font-weight:900}
+    .close{color:#2E8BFF;font-weight:900;cursor:pointer;}
+    .sheetBody{padding: 0 18px 16px;overflow:auto;-webkit-overflow-scrolling: touch;flex:1;}
+    .search{border:1px solid var(--stroke);background:#FAFAFD;border-radius: 14px;padding: 12px 12px;display:flex;gap:10px;align-items:center;margin: 10px 0 14px;}
+    .search input{border:none;outline:none;background:transparent;width:100%;font-size:15px;font-weight:700;}
+    .search .sico{opacity:.5;font-weight:900}
+    .pillTabs{display:inline-flex;background:#F0F0F7;border:1px solid var(--stroke);border-radius: 14px;overflow:hidden;margin-bottom: 10px;}
+    .pill{padding:10px 12px;font-weight:900;font-size:14px;color:#7A7A86;cursor:pointer;user-select:none;}
+    .pill.active{background: rgba(123,77,255,.16);color: var(--accent);}
+
+    .item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding: 12px 0;cursor:pointer;}
+    .item + .item{border-top:1px solid var(--stroke)}
+    .left{display:flex;align-items:center;gap:10px;min-width:0;}
+    .flag{width:34px;height:34px;border-radius: 12px;background: rgba(123,77,255,.12);border:1px solid rgba(123,77,255,.18);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--accent);flex:0 0 auto;}
+    .tt{min-width:0;}
+    .tt .t1{font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .tt .t2{color:var(--muted);font-weight:800;font-size:13px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .right{display:flex;align-items:center;gap:10px;flex:0 0 auto;color:#2B2B33;font-weight:900;}
+    .chev{opacity:.35;font-weight:900}
+
+    .planCard{background:#fff;border:1px solid var(--stroke);border-radius: 18px;padding: 12px 12px;display:flex;flex-direction:column;gap:8px;cursor:pointer;margin-bottom: 10px;}
+    .planTop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+    .planName{font-weight:900}
+    .planMeta{color:var(--muted);font-weight:800;font-size:13px}
+    .price{font-weight:900;background: rgba(123,77,255,.12);border:1px solid rgba(123,77,255,.18);padding:6px 10px;border-radius: 999px;color:var(--accent);white-space:nowrap;}
+    .btnPrimary{width:100%;padding: 14px 14px;border:none;border-radius: 18px;background: rgba(123,77,255,.16);color: var(--accent);font-weight:900;cursor:pointer;}
+    .btnPrimary.solid{background: var(--accent);color:#fff;}
+    .btnPrimary:disabled{opacity:.35; cursor:not-allowed;}
+    .hint{display:flex;gap:10px;align-items:flex-start;color: var(--muted);font-weight:800;font-size:13px;margin: 10px 0 14px;}
+    .hint .bang{width:18px;height:18px;border-radius:999px;display:flex;align-items:center;justify-content:center;border:1px solid #D8D8E4;background:#fff;color:#9A9AAC;flex:0 0 auto;font-size:12px;font-weight:900;margin-top:1px;}
+
+    /* Order card sheet */
+    .hero{padding: 10px 0 12px;display:flex;flex-direction:column;align-items:center;text-align:center;}
+    .heroIco{width:68px;height:68px;border-radius: 20px;background: rgba(123,77,255,.12);border:1px solid rgba(123,77,255,.18);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:1000;font-size:28px;position:relative;}
+    .heroIco .mini{position:absolute; left:-8px; top:-8px;width:26px;height:26px;border-radius:999px;background:#2EA8FF;border:2px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:900;}
+    .heroAmt{font-size:42px;font-weight:1000;letter-spacing:-.8px;margin-top:10px}
+    .heroAmt small{font-size:22px;font-weight:1000;opacity:.55}
+    .heroSub{margin-top:2px;color:var(--muted);font-weight:900}
+    .heroBtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin: 14px 0 12px;}
+    .heroBtn{padding: 14px 12px;border-radius: 18px;border:none;background: rgba(123,77,255,.12);color: var(--accent);font-weight:1000;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;}
+    .kv{border-top: 1px solid var(--stroke);margin-top: 10px;padding-top: 8px;}
+    .kvRow{display:flex;align-items:center;justify-content:space-between;padding: 11px 0;gap:12px;}
+    .kvRow + .kvRow{border-top:1px solid var(--stroke)}
+    .k{color:var(--muted);font-weight:900}
+    .v{font-weight:1000;display:flex;align-items:center;gap:8px;white-space:nowrap}
+    .st{display:inline-flex;align-items:center;gap:8px;font-weight:1000;}
+    .st .c{width:16px;height:16px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:1000;}
+    .st.good{color:var(--good)}
+    .st.good .c{background: var(--good)}
+    .st.progress{color:#7B4DFF}
+    .st.progress .c{background: #7B4DFF}
+    .st.bad{color:var(--bad)}
+    .st.bad .c{background: var(--bad)}
+    .bottomClose{padding: 14px 18px 18px;border-top:1px solid var(--stroke);background:#fff;}
+    .bigClose{width:100%;padding: 16px 14px;border-radius: 18px;border: none;background:#F2F2F8;font-weight:1000;cursor:pointer;}
+
+    /* Story instruction */
+    .storyWrap{margin-top: 8px;border:1px solid var(--stroke);border-radius: 18px;overflow:hidden;background:#fff;}
+    .storyTop{display:flex;align-items:center;justify-content:space-between;padding: 12px 12px;background: #FAFAFD;border-bottom:1px solid var(--stroke);}
+    .storyTitle{font-weight:1000}
+    .progressDots{display:flex;gap:6px}
+    .progressDots span{width:7px;height:7px;border-radius:999px;background:#D1D1DE}
+    .progressDots span.on{background:#7E7E92}
+    .storyBody{padding: 12px 12px 14px}
+    .stepH{font-weight:1000;font-size:18px;letter-spacing:-.2px}
+    .stepP{color:#55556A;font-weight:800;line-height:1.35;margin-top:6px}
+    .storyNav{display:flex;gap:10px;margin-top:12px;}
+    .btnGhost{flex:1;padding: 12px 12px;border-radius: 16px;border:1px solid var(--stroke);background:#fff;font-weight:1000;cursor:pointer;}
+    .btnNext{flex:1;padding: 12px 12px;border-radius: 16px;border:none;background: var(--accent);color:#fff;font-weight:1000;cursor:pointer;}
+    .smallNote{color:var(--muted);font-weight:800;font-size:13px;margin-top:8px}
+
+    /* Compatibility suggestions */
+    .suggList{margin-top:-2px;border:1px solid var(--stroke);border-radius: 14px;overflow:hidden;background:#fff;}
+    .suggItem{padding: 12px 12px;cursor:pointer;font-weight:900;}
+    .suggItem + .suggItem{border-top:1px solid var(--stroke)}
+    .suggItem:hover{background:#FAFAFD}
+    .mutedBox{background:#FAFAFD;border:1px solid var(--stroke);border-radius: 14px;padding:12px;color:#5C5C70;font-weight:800;}
+  
+    /* --- iPhone note: if JS is blocked (iOS Preview/QuickLook), show gate --- */
+    .qa, .svc, .op, .item, .planCard, .tab, .close, .heroBtn, button{
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .jsGate{
+      position:absolute; inset:0;
+      z-index:999;
+      display:flex; align-items:center; justify-content:center;
+      padding:24px;
+      background: rgba(17,17,24,.55);
+      backdrop-filter: blur(10px);
+    }
+    .jsGateCard{
+      width:100%;
+      max-width: 340px;
+      background:#fff;
+      border:1px solid var(--stroke);
+      border-radius: 22px;
+      padding: 16px 16px 14px;
+      box-shadow: var(--shadow);
+    }
+    .jsGateTitle{ font-weight:1000; font-size:18px; letter-spacing:-.2px }
+    .jsGateText{ color:#55556A; font-weight:800; line-height:1.35; margin-top:8px; font-size:14px }
+    .jsGateSteps{ margin-top:10px; color:#55556A; font-weight:800; font-size:14px; line-height:1.35 }
+    .jsGateSteps b{ color:#111118 }
+    .jsGateSteps code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background:#F2F2F8;
+      padding:2px 6px;
+      border-radius: 8px;
+      border:1px solid var(--stroke);
+      font-size: 13px;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="phone" id="phone">
+      <div class="statusbar">
+        <div id="time">16:26</div>
+        <div class="icons">
+          <span>◔◔◔</span>
+          <span>⌁⌁</span>
+          <span style="border:1px solid rgba(17,17,24,.18); padding:1px 6px; border-radius:999px;">▮▮</span>
+        </div>
+      </div>
+
+      <div class="app">
+        <div class="topHeader">
+          <div class="email">aisi.diychkova100001@gmail.com</div>
+          <div class="avatar">a</div>
+        </div>
+
+        <div class="quickActions">
+          <div class="qa">
+            <div class="ico">＋</div>
+            <div class="lbl">Пополнить<br/>баланс</div>
+          </div>
+          <div class="qa secondary">
+            <div class="ico">⇅</div>
+            <div class="lbl">Перевести или<br/>вывести</div>
+          </div>
+          <div class="qa tertiary">
+            <div class="ico">⟲</div>
+            <div class="lbl">Обменять</div>
+          </div>
+        </div>
+
+        <div class="content" id="mainScroll">
+          <div class="sectionTitle">Активы</div>
+
+          <div class="assetsRow">
+            <div class="assetCard">
+              <div class="assetTop">
+                <div class="coin">₽</div>
+                <div class="chip">RUB</div>
+              </div>
+              <div class="assetAmt">100 000.29</div>
+              <div class="assetCur">RUB</div>
+            </div>
+            <div class="assetCard">
+              <div class="assetTop">
+                <div class="coin">₮</div>
+                <div class="chip">TRC-20</div>
+              </div>
+              <div class="assetAmt">0.05</div>
+              <div class="assetCur">USDT TRC-20</div>
+            </div>
+            <div class="assetCard">
+              <div class="assetTop">
+                <div class="coin">◈</div>
+                <div class="chip">TON</div>
+              </div>
+              <div class="assetAmt">0</div>
+              <div class="assetCur">TON</div>
+            </div>
+          </div>
+
+          <div class="banner">
+            <div class="tag">1/1 пройдено</div>
+            <div class="h">Брянск</div>
+            <div class="p">Новый офис уже открыт!</div>
+          </div>
+          <div class="dots"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
+
+          <div style="height:12px"></div>
+
+          <div class="sectionTitle" style="margin-top:12px">Сервисы</div>
+          <div class="servicesGrid">
+            <div class="svc" data-open="fx">
+              <div class="badgeNew">Новое</div>
+              <div class="ico">🏦</div>
+              <div class="name">Валютные<br/>платежи</div>
+            </div>
+            <div class="svc" data-open="cardout">
+              <div class="ico">💳</div>
+              <div class="name">Вывод<br/>на карту</div>
+            </div>
+            <div class="svc" data-open="esim" role="button" tabindex="0" onclick="openEsimFlow('country')">
+              <div class="ico">📶</div>
+              <div class="name">eSIM</div>
+            </div>
+          </div>
+
+          <div class="opsHeader">
+            <div class="sectionTitle" style="margin:18px 0 8px;font-size:26px">Последние операции</div>
+            <div class="date" id="opsDate">08 февраля</div>
+          </div>
+
+          <div class="listCard" id="opsList"></div>
+
+          <div style="height:26px"></div>
+        </div>
+
+        <div class="tabbar">
+          <div class="tab active" data-tab="home">
+            <div class="tIco">⌂</div><div>Главная</div>
+          </div>
+          <div class="tab" data-tab="p2p" role="button" tabindex="0" onclick="openInfoSheet('p2p')">
+            <div class="tIco">⇄</div><div>P2P</div>
+          </div>
+          <div class="tab" data-tab="chat" role="button" tabindex="0" onclick="openInfoSheet('chat')">
+            <div class="tIco">💬</div><div>Чат</div>
+          </div>
+          <div class="tab" data-tab="settings" role="button" tabindex="0" onclick="openInfoSheet('settings')">
+            <div class="tIco">⚙</div><div>Настройки</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JS gate: shown by default; hidden by JS on load -->
+      <div class="jsGate" id="jsGate" aria-live="polite">
+        <div class="jsGateCard">
+          <div class="jsGateTitle">Чтобы прототип работал на iPhone</div>
+          <div class="jsGateText">
+            Если вы видите это окно — страница открыта в режиме предпросмотра, где <b>JavaScript отключен</b>. Поэтому “тапы” не работают.
+          </div>
+          <div class="jsGateSteps">
+            <b>Вариант 1 (самый простой):</b> откройте файл по ссылке <b>http(s)</b> (например, GitHub Pages / Netlify Drop).<br><br>
+            <b>Вариант 2 (если рядом ноут):</b> в папке с файлом выполните <code>python3 -m http.server 8000</code> и откройте на iPhone в Safari:
+            <b>http://IP-ноута:8000/esim_prototype_ios_v6.html</b><br><br>
+            <b>Важно:</b> iPhone и ноут должны быть в одной Wi‑Fi сети.
+          </div>
+          <div class="jsGateText" style="margin-top:10px">
+            Откроете по http(s) — это окно пропадёт автоматически, и прототип станет кликабельным.
+          </div>
+        </div>
+      </div>
+
+
+      <div class="overlay" id="overlay"></div>
+      <div class="sheet" id="sheet">
+        <div class="grabber"></div>
+        <div class="sheetHeader">
+          <h3 id="sheetTitle">eSIM</h3>
+          <div class="close" id="sheetClose">Закрыть</div>
+        </div>
+        <div class="sheetBody" id="sheetBody"></div>
+        <div class="bottomClose" id="sheetBottom" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Hide iOS Preview gate (means JS is running)
+    (function(){
+      var gate = document.getElementById('jsGate');
+      if(gate) gate.style.display = 'none';
+    })();
+
+    // --- tiny helpers
+    const $ = (s, p=document)=>p.querySelector(s);
+    const $$ = (s, p=document)=>Array.from(p.querySelectorAll(s));
+    const overlay = $('#overlay');
+    const sheet = $('#sheet');
+    const sheetTitle = $('#sheetTitle');
+    const sheetBody = $('#sheetBody');
+    const sheetBottom = $('#sheetBottom');
+
+    const APPLE_ESIM_MODELS = [
+      "iPhone 17",
+      "iPhone 17 Pro",
+      "iPhone 17 Pro Max",
+      "IPhone 17 Air",
+      "iPhone 16",
+      "iPhone 16 Pro",
+      "iPhone 16 Pro Max",
+      "iPhone 15",
+      "iPhone 15 Plus",
+      "iPhone 15 Pro",
+      "iPhone 15 Pro Max",
+      "iPhone 14",
+      "iPhone 14 Plus",
+      "iPhone 14 Pro",
+      "iPhone 14 Pro Max",
+      "iPhone 13",
+      "iPhone 13 Mini",
+      "iPhone 13 Pro",
+      "iPhone 13 Pro Max",
+      "iPhone 12",
+      "iPhone 12 Mini",
+      "iPhone 12 Pro",
+      "iPhone 12 Pro Max",
+      "iPhone 11",
+      "iPhone 11 Pro",
+      "iPhone 11 Pro Max",
+      "iPhone XS",
+      "iPhone XS Max",
+      "iPhone XR",
+      "iPhone SE (2020)",
+      "iPhone SE (2022)",
+      "iPad (7th generation)",
+      "iPad (8th generation)",
+      "iPad (9th generation)",
+      "iPad (10th generation)",
+      "iPad Air (3rd generation)",
+      "iPad Air (4th generation)",
+      "iPad Air (5th generation)",
+      "iPad Pro 11-inch (1st generation)",
+      "iPad Pro 11-inch (2nd generation)",
+      "iPad Pro 11-inch (3rd generation)",
+      "iPad Pro 12.9-inch (3rd generation)",
+      "iPad Pro 12.9-inch (4th generation)",
+      "iPad Pro 12.9-inch (5th generation)",
+      "iPad Pro 12.9-inch (6th generation)",
+      "iPad Mini (5th generation)",
+      "iPad Mini (6th generation)"
+    ];
+
+    const state = {
+      currentTab: 'home',
+      esim: {
+        country: null,
+        plan: null,
+        check: { os: 'all', model: '', supported: null, matches: [] },
+        pay: { wallet: null },
+      },
+      orders: []
+    };
+
+    // Seed operations (для атмосферы)
+    const now = new Date();
+    const fmtDate = (d)=> String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + d.getFullYear();
+    const fmtTime = (d)=> String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+    const niceDate = (d)=> fmtDate(d) + ', ' + fmtTime(d);
+
+    const opsSeed = [
+      {
+        id: 'seed_topup',
+        title: 'Пополнение сервиса',
+        subtitle: 'USDT TRC-20',
+        tag: 'TRC-20',
+        amount: '9.18 USDT',
+        amountClass: '',
+        icon: '₮',
+        mini: '↗',
+        createdAt: new Date(now.getTime() - 6*60*60*1000),
+        openable: false,
+      },
+      {
+        id: 'seed_ref',
+        title: 'Реферальный вывод',
+        subtitle: 'Реферальный счет',
+        tag: '',
+        amount: '- 3 USDT',
+        amountClass: 'good',
+        icon: '👥',
+        mini: '↗',
+        createdAt: new Date(now.getTime() - 7*60*60*1000),
+        openable: false,
+      },
+    ];
+
+    const countries = [
+      { name:'Турция', slug:'turkey', priceFrom: '6.14', code:'TR' },
+      { name:'ОАЭ', slug:'united-arab-emirates', priceFrom: '7.28', code:'AE' },
+      { name:'Таиланд', slug:'thailand', priceFrom: '6.20', code:'TH' },
+      { name:'Египет', slug:'egypt', priceFrom: '8.12', code:'EG' },
+      { name:'США', slug:'united-states', priceFrom: '5.99', code:'US' },
+      { name:'Германия', slug:'germany', priceFrom: '4.90', code:'DE' },
+    ];
+
+    const plansByCountry = {
+      turkey: [
+        { id: 1101, name:'1 GB', period:7, dataGB:1, type:'DATA', fup:'', speed:'4G/5G', operator:'Turkcell', price:'6.20' },
+        { id: 1102, name:'3 GB', period:15, dataGB:3, type:'DATA', fup:'', speed:'4G', operator:'Vodafone TR', price:'10.90' },
+        { id: 1103, name:'Безлимит', period:7, dataGB:-1, type:'DATA', fup:'Политика честного использования: скорость может быть снижена после большого объёма трафика', speed:'4G', operator:'Turk Telekom', price:'7.80' },
+      ],
+      thailand: [
+        { id: 1201, name:'1 GB', period:7, dataGB:1, type:'DATA', fup:'', speed:'4G/5G', operator:'AIS', price:'6.20' },
+        { id: 1202, name:'5 GB', period:30, dataGB:5, type:'DATA', fup:'', speed:'4G', operator:'DTAC', price:'14.90' },
+      ],
+      'united-arab-emirates': [
+        { id: 1301, name:'2 GB', period:15, dataGB:2, type:'DATA', fup:'', speed:'4G/5G', operator:'Etisalat', price:'9.60' },
+        { id: 1302, name:'10 GB', period:30, dataGB:10, type:'DATA', fup:'', speed:'5G', operator:'du', price:'24.15' },
+      ],
+      egypt: [
+        { id: 1401, name:'1 GB', period:7, dataGB:1, type:'DATA', fup:'', speed:'4G', operator:'Orange EG', price:'8.12' },
+      ],
+      'united-states': [
+        { id: 1501, name:'3 GB', period:30, dataGB:3, type:'DATA', fup:'', speed:'4G/5G', operator:'T-Mobile', price:'11.90' },
+        { id: 1502, name:'Безлимит', period:7, dataGB:-1, type:'DATA', fup:'Политика честного использования: скорость может быть снижена после большого объёма трафика', speed:'5G', operator:'AT&T', price:'19.90' },
+      ],
+      germany: [
+        { id: 1601, name:'1 GB', period:7, dataGB:1, type:'DATA', fup:'', speed:'4G/5G', operator:'Telekom', price:'4.90' },
+      ],
+    };
+
+    const wallets = [
+      { id:'rub', name:'RUB', sub:'Москва', icon:'₽', balance:'100 000.29 RUB' },
+      { id:'usdt', name:'USDT TRC-20', sub:'TRC-20', icon:'₮', balance:'0.05 USDT' },
+      { id:'ton', name:'TON', sub:'', icon:'◈', balance:'0 TON' },
+    ];
+
+    // mock FX (для прототипа)
+    const FX = {
+      rub: { symbol:'RUB', ratePerUSD: 92.0 },   // 1 USD = 92 RUB
+      usdt: { symbol:'USDT', ratePerUSD: 1.0 },  // 1 USD = 1 USDT
+      ton: { symbol:'TON', ratePerUSD: 0.35 },   // 1 USD = 0.35 TON (условно)
+    };
+
+    // Render operations list
+    function renderOps(){
+      const list = $('#opsList');
+      const all = [...state.orders].sort((a,b)=>b.createdAt - a.createdAt);
+      const merged = [...all, ...opsSeed].sort((a,b)=>b.createdAt - a.createdAt);
+      list.innerHTML = merged.map(op => {
+        const tag = op.tag ? `<span class="chip">${op.tag}</span>` : '';
+        const amountClass = op.amountClass ? op.amountClass : '';
+        const clickable = op.openable ? 'data-open-order="'+op.id+'"' : '';
+        return `
+          <div class="op" ${clickable}>
+            <div class="opIco">${op.icon || '📶'}<div class="mini">${op.mini || '↗'}</div></div>
+            <div class="opMain">
+              <div class="opTitle">${op.title}</div>
+              <div class="opSub">${op.subtitle}${tag ? '&nbsp;' + tag : ''}</div>
+            </div>
+            <div class="opAmt ${amountClass}">${op.amount}</div>
+          </div>
+        `;
+      }).join('');
+      $$('[data-open-order]').forEach(el=>{
+        el.addEventListener('click', ()=> {
+          const id = el.getAttribute('data-open-order');
+          const ord = state.orders.find(o=>o.id===id);
+          if(ord) openOrderSheet(ord.id);
+        });
+      });
+    }
+
+    // tabs
+    $$('.tab').forEach(t=>{
+      t.addEventListener('click', ()=>{
+        $$('.tab').forEach(x=>x.classList.remove('active'));
+        t.classList.add('active');
+        state.currentTab = t.getAttribute('data-tab');
+        if(state.currentTab!=='home') openInfoSheet(state.currentTab);
+      });
+    });
+
+    // services
+    $$('[data-open="esim"]').forEach(el=>{
+      el.addEventListener('click', ()=> openEsimFlow('country'));
+    });
+
+    $('#sheetClose').addEventListener('click', closeSheet);
+    overlay.addEventListener('click', closeSheet);
+
+    function openSheet(title, bodyHTML, bottomHTML=null){
+      sheetTitle.textContent = title;
+      sheetBody.innerHTML = bodyHTML;
+      if(bottomHTML){
+        sheetBottom.style.display = 'block';
+        sheetBottom.innerHTML = bottomHTML;
+      }else{
+        sheetBottom.style.display = 'none';
+        sheetBottom.innerHTML = '';
+      }
+      overlay.classList.add('show');
+      sheet.classList.add('show');
+    }
+    function closeSheet(){
+      overlay.classList.remove('show');
+      sheet.classList.remove('show');
+    }
+
+    function openInfoSheet(tab){
+      const titles = { p2p:'P2P', chat:'Чат', settings:'Настройки' };
+      openSheet(titles[tab] || 'Раздел', `
+        <div style="padding-top:8px">
+          <div class="listCard">
+            <div class="row">
+              <div style="font-weight:1000">Заглушка прототипа</div>
+              <div class="chip">demo</div>
+            </div>
+            <div class="smallNote" style="margin-top:10px">
+              Этот экран здесь только чтобы сохранить нижнюю навигацию.
+            </div>
+          </div>
+          <div style="height:12px"></div>
+          <button class="btnPrimary solid" onclick="closeSheet()">Вернуться на Главную</button>
+        </div>
+      `);
+    }
+
+    // --- Flow screens
+    function openEsimFlow(step){
+      if(step==='country') return renderCountryStep();
+      if(step==='plans') return renderPlansStep();
+      if(step==='compat') return renderCompatStep();
+      if(step==='pay') return renderPayStep();
+    }
+
+    function renderCountryStep(){
+      state.esim.country = null;
+      state.esim.plan = null;
+      state.esim.pay.wallet = null;
+      state.esim.check = { os:'all', model:'', supported:null, matches:[] };
+
+      openSheet('eSIM', `
+        <div style="padding-top:6px">
+          <div class="search">
+            <div class="sico">⌕</div>
+            <input id="countrySearch" placeholder="Поиск страны" />
+          </div>
+          <div id="countryList"></div>
+        </div>
+      `);
+
+      const list = $('#countryList');
+      const input = $('#countrySearch');
+
+      function paint(q=''){
+        const query = (q||'').trim().toLowerCase();
+        const items = countries
+          .filter(c=>!query || c.name.toLowerCase().includes(query))
+          .map(c=>`
+            <div class="item" data-country="${c.slug}">
+              <div class="left">
+                <div class="flag">${c.code}</div>
+                <div class="tt">
+                  <div class="t1">${c.name}</div>
+                  <div class="t2">от ${c.priceFrom} USD</div>
+                </div>
+              </div>
+              <div class="right"><span class="chev">›</span></div>
+            </div>
+          `).join('');
+        list.innerHTML = `<div class="listCard">${items || '<div class="smallNote">Ничего не найдено</div>'}</div>`;
+        $$('[data-country]').forEach(el=>{
+          el.addEventListener('click', ()=>{
+            const slug = el.getAttribute('data-country');
+            state.esim.country = countries.find(c=>c.slug===slug);
+            openEsimFlow('plans');
+          });
+        });
+      }
+      input.addEventListener('input', ()=>paint(input.value));
+      paint('');
+    }
+
+    function renderPlansStep(){
+      const c = state.esim.country;
+      const plans = plansByCountry[c.slug] || [];
+      const body = `
+        <div style="padding-top:6px">
+          <div class="listCard" style="margin-bottom:12px">
+            <div class="row">
+              <div class="left" style="gap:10px">
+                <div class="flag">${c.code}</div>
+                <div class="tt">
+                  <div class="t1">${c.name}</div>
+                  <div class="t2">Выберите тариф</div>
+                </div>
+              </div>
+              <div class="right"><span class="chip">страна</span></div>
+            </div>
+          </div>
+
+          ${plans.map(p=>`
+            <div class="planCard" data-plan="${p.id}">
+              <div class="planTop">
+                <div style="min-width:0">
+                  <div class="planName">${p.name}</div>
+                  <div class="planMeta">${formatData(p)} • ${p.period} дн • ${p.speed}</div>
+                </div>
+                <div class="price">${p.price} USD</div>
+              </div>
+              ${p.fup ? `<div class="hint" style="margin:0"><div class="bang">!</div><div>${shorten(p.fup, 96)}</div></div>` : ``}
+            </div>
+          `).join('')}
+
+          <div style="height:6px"></div>
+          <button class="btnPrimary" id="backToCountries">Назад к выбору страны</button>
+        </div>
+      `;
+      openSheet('eSIM', body);
+
+      $('#backToCountries').addEventListener('click', ()=> openEsimFlow('country'));
+      $$('[data-plan]').forEach(el=>{
+        el.addEventListener('click', ()=>{
+          const id = Number(el.getAttribute('data-plan'));
+          state.esim.plan = plans.find(p=>p.id===id);
+          openEsimFlow('compat');
+        });
+      });
+    }
+
+    function renderCompatStep(){
+      openSheet('Проверка устройства', `
+        <div style="padding-top:6px">
+          <div class="listCard">
+            <div class="pillTabs" style="margin:0">
+              <div class="pill active" data-os="all">Все</div>
+              <div class="pill" data-os="iphone">iPhone</div>
+              <div class="pill" data-os="android">Android</div>
+            </div>
+
+            <div class="search" style="margin-top:12px">
+              <div class="sico">⌕</div>
+              <input id="modelInput" placeholder="Введите модель, например: iPhone 17 / 17" autocomplete="off" />
+            </div>
+
+            <div id="suggestions"></div>
+
+            <div id="compatResult" style="margin-top:12px"></div>
+            <div class="smallNote">Проверку можно пропустить — это не влияет на покупку в прототипе.</div>
+          </div>
+
+          <div style="height:12px"></div>
+          <div class="heroBtns" style="grid-template-columns:1fr 1fr">
+            <button class="btnGhost" id="skipCompat">Пропустить</button>
+            <button class="btnNext" id="goPay">Купить eSIM</button>
+          </div>
+
+          <button class="btnPrimary" id="backToPlans2" style="margin-top:10px">Назад к тарифам</button>
+        </div>
+      `);
+
+      const input = $('#modelInput');
+      const suggestions = $('#suggestions');
+      const res = $('#compatResult');
+      const pills = $$('[data-os]');
+
+      function normalize(s){
+        return String(s||'')
+          .toLowerCase()
+          .replace(/\s+/g,' ')
+          .replace(/[()]/g,' ')
+          .replace(/[-–—]/g,' ')
+          .replace(/[^a-z0-9а-яё\s]/gi,' ')
+          .replace(/\s+/g,' ')
+          .trim();
+      }
+
+      function findMatches(q){
+        const nq = normalize(q);
+        if(!nq) return [];
+        // если ввели "iphone" — показываем все айфоны/айпады
+        return APPLE_ESIM_MODELS
+          .filter(m=> normalize(m).includes(nq) || nq.includes(normalize(m)))
+          .slice(0, 8);
+      }
+
+      function isSupported(q, os){
+        const nq = normalize(q);
+        if(!nq) return null;
+        if(os === 'android') return null; // в прототипе Android не проверяем
+        const matches = findMatches(q);
+        return matches.length > 0;
+      }
+
+      function renderSuggestions(){
+        const q = input.value.trim();
+        if(state.esim.check.os === 'android'){
+          suggestions.innerHTML = `<div class="mutedBox">Проверка Android в прототипе отключена. Для демо проверяем только Apple по списку.</div>`;
+          return;
+        }
+        const matches = findMatches(q);
+        state.esim.check.matches = matches;
+        if(!q){
+          suggestions.innerHTML = '';
+          return;
+        }
+        if(matches.length === 0){
+          suggestions.innerHTML = '';
+          return;
+        }
+        suggestions.innerHTML = `
+          <div class="suggList">
+            ${matches.map(m=>`<div class="suggItem" data-sugg="${escapeAttr(m)}">${m}</div>`).join('')}
+          </div>
+        `;
+        $$('[data-sugg]').forEach(el=>{
+          el.addEventListener('click', ()=>{
+            const v = el.getAttribute('data-sugg');
+            input.value = v;
+            state.esim.check.model = v;
+            state.esim.check.supported = isSupported(v, state.esim.check.os);
+            renderSuggestions();
+            renderResult();
+          });
+        });
+      }
+
+      function renderResult(){
+        const q = input.value.trim();
+        if(state.esim.check.os === 'android'){
+          res.innerHTML = '';
+          return;
+        }
+        if(!q){
+          res.innerHTML = `<div class="smallNote">Введите модель — подсветим совместимость и покажем подходящие варианты.</div>`;
+          return;
+        }
+        const ok = isSupported(q, state.esim.check.os);
+        if(ok){
+          const m = findMatches(q);
+          const extra = m.length ? `<div class="smallNote" style="margin-top:8px">Подходит: ${m.slice(0,3).join(', ')}{m.length>3?'…':''}</div>` : '';
+          res.innerHTML = `
+            <div class="listCard" style="border-color: rgba(24,179,107,.25); background: rgba(24,179,107,.06)">
+              <div class="row">
+                <div class="st good"><span class="c">✓</span> eSIM поддерживается</div>
+                <div class="chip">Apple</div>
+              </div>
+              ${extra}
+            </div>
+          `;
+        }else{
+          res.innerHTML = `
+            <div class="listCard" style="border-color: rgba(235,34,34,.25); background: rgba(235,34,34,.06)">
+              <div class="row">
+                <div class="st bad"><span class="c">!</span> Не нашли модель в списке</div>
+                <div class="chip">Проверьте ввод</div>
+              </div>
+              <div class="smallNote" style="margin-top:8px">
+                В прототипе проверяем только Apple по списку. Можно пропустить проверку и купить eSIM.
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      function syncUI(){
+        pills.forEach(p=>p.classList.toggle('active', p.dataset.os===state.esim.check.os));
+        input.disabled = (state.esim.check.os === 'android');
+        if(input.disabled){
+          input.value = '';
+          state.esim.check.model = '';
+        }
+        renderSuggestions();
+        renderResult();
+      }
+
+      pills.forEach(p=>{
+        p.addEventListener('click', ()=>{
+          state.esim.check.os = p.dataset.os;
+          syncUI();
+        });
+      });
+
+      input.addEventListener('input', ()=>{
+        state.esim.check.model = input.value.trim();
+        renderSuggestions();
+        renderResult();
+      });
+
+      $('#skipCompat').addEventListener('click', ()=> openEsimFlow('pay'));
+      $('#goPay').addEventListener('click', ()=> openEsimFlow('pay'));
+      $('#backToPlans2').addEventListener('click', ()=> openEsimFlow('plans'));
+
+      syncUI();
+    }
+
+    function renderPayStep(){
+      const c = state.esim.country;
+      const p = state.esim.plan;
+      const priceUSD = Number(p.price);
+
+      openSheet('Оплата', `
+        <div style="padding-top:6px">
+          <div class="listCard" style="margin-bottom:12px">
+            <div class="row">
+              <div style="font-weight:1000">Оплата eSIM</div>
+              <div class="chip">${priceUSD.toFixed(2)} USD</div>
+            </div>
+            <div class="smallNote" style="margin-top:8px">
+              Валюта тарифа — USD. Клиент выбирает кошелек (фиат/крипта) — под капотом делаем конвертацию.
+            </div>
+          </div>
+
+          <div class="listCard" id="walletBox">${renderWalletSelected()}</div>
+
+          <div style="height:12px"></div>
+          <button class="btnPrimary solid" id="payBtn" ${state.esim.pay.wallet ? '' : 'disabled'}>Продолжить</button>
+
+          <div class="hint">
+            <div class="bang">!</div>
+            <div>В прототипе курсы и комиссии условные.</div>
+          </div>
+
+          <button class="btnPrimary" id="backToCompat">Назад</button>
+        </div>
+      `);
+
+      $('#walletBox').addEventListener('click', ()=> openWalletPicker());
+
+      $('#backToCompat').addEventListener('click', ()=> openEsimFlow('compat'));
+      $('#payBtn').addEventListener('click', ()=> createEsimOrder());
+    }
+
+    function renderWalletSelected(){
+      const w = state.esim.pay.wallet;
+      const p = state.esim.plan;
+      const priceUSD = Number(p.price);
+
+      if(!w){
+        return `
+          <div class="row">
+            <div class="left">
+              <div class="flag">👛</div>
+              <div class="tt">
+                <div class="t1">Выбрать кошелек</div>
+                <div class="t2">Фиат или крипта</div>
+              </div>
+            </div>
+            <div class="right"><span class="chev">›</span></div>
+          </div>
+        `;
+      }
+
+      const fx = FX[w.id] || FX.usdt;
+      const debit = priceUSD * fx.ratePerUSD;
+
+      return `
+        <div class="row">
+          <div class="left">
+            <div class="flag">${w.icon}</div>
+            <div class="tt">
+              <div class="t1">${w.name}</div>
+              <div class="t2">${w.balance}</div>
+            </div>
+          </div>
+          <div class="right"><span class="chev">›</span></div>
+        </div>
+
+        <div class="kv">
+          <div class="kvRow">
+            <div class="k">Цена тарифа</div>
+            <div class="v">${priceUSD.toFixed(2)} USD</div>
+          </div>
+          <div class="kvRow">
+            <div class="k">Курс (прототип)</div>
+            <div class="v">1 USD = ${fx.ratePerUSD} ${fx.symbol}</div>
+          </div>
+          <div class="kvRow">
+            <div class="k">Списание</div>
+            <div class="v">${formatDebit(debit, w.id)} ${fx.symbol}</div>
+          </div>
+          <div class="kvRow">
+            <div class="k">Комиссия</div>
+            <div class="v">0.00 USD</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function formatDebit(x, id){
+      if(id==='rub') return Math.round(x*100)/100;
+      return Math.round(x*10000)/10000;
+    }
+
+    function openWalletPicker(){
+      openSheet('Выбор кошелька', `
+        <div style="padding-top:6px">
+          <div class="search">
+            <div class="sico">⌕</div>
+            <input id="walletSearch" placeholder="Поиск" />
+          </div>
+
+          <div class="sectionTitle" style="font-size:18px;margin: 6px 0 10px">Мои кошельки</div>
+          <div id="walletList" class="listCard"></div>
+        </div>
+      `);
+
+      const list = $('#walletList');
+      const input = $('#walletSearch');
+
+      function paint(q=''){
+        const query = (q||'').trim().toLowerCase();
+        list.innerHTML = wallets
+          .filter(w=>!query || (w.name + ' ' + w.sub).toLowerCase().includes(query))
+          .map(w=>`
+            <div class="item" data-wallet="${w.id}">
+              <div class="left">
+                <div class="flag">${w.icon}</div>
+                <div class="tt">
+                  <div class="t1">${w.name}</div>
+                  <div class="t2">${w.balance}</div>
+                </div>
+              </div>
+              <div class="right"><span class="chev">›</span></div>
+            </div>
+          `).join('');
+        $$('[data-wallet]').forEach(el=>{
+          el.addEventListener('click', ()=>{
+            const id = el.getAttribute('data-wallet');
+            state.esim.pay.wallet = wallets.find(w=>w.id===id);
+            renderPayStep();
+          });
+        });
+      }
+      input.addEventListener('input', ()=>paint(input.value));
+      paint('');
+    }
+
+    function createEsimOrder(){
+      const c = state.esim.country;
+      const p = state.esim.plan;
+      const w = state.esim.pay.wallet;
+
+      const id = 'ord_' + Math.random().toString(16).slice(2, 10);
+      const createdAt = new Date();
+      const priceUSD = Number(p.price);
+
+      const fx = FX[w.id] || FX.usdt;
+      const debit = priceUSD * fx.ratePerUSD;
+
+      const order = {
+        id,
+        title: 'eSIM',
+        subtitle: `${c.name} • ${formatData(p)} • ${p.period} дн`,
+        tag: '',
+        amount: `-${formatDebit(debit, w.id)} ${fx.symbol}`,
+        amountClass: '',
+        icon: '📶',
+        mini: '↗',
+        createdAt,
+        openable: true,
+        status: 'progress', // progress | done | error
+        country: c,
+        plan: p,
+        wallet: w,
+        totalUSD: priceUSD.toFixed(2),
+        feeUSD: '0.00',
+      };
+
+      state.orders.unshift(order);
+      renderOps();
+      openOrderSheet(id);
+
+      // simulate processing -> done
+      setTimeout(()=>{
+        const o = state.orders.find(x=>x.id===id);
+        if(!o) return;
+        o.status = 'done';
+        renderOps();
+      }, 5500);
+    }
+
+    function openOrderSheet(orderId){
+      const o = state.orders.find(x=>x.id===orderId);
+      if(!o) return;
+
+      const isProgress = o.status === 'progress';
+      const st = (o.status==='done') ? {cls:'good', txt:'Исполнено'} :
+                 (o.status==='error') ? {cls:'bad', txt:'Ошибка'} :
+                 {cls:'progress', txt:'В процессе'};
+
+      openSheet('eSIM', `
+        <div class="hero">
+          <div class="heroIco">📶<div class="mini">↗</div></div>
+          <div class="heroAmt">${o.totalUSD}<small> USD</small></div>
+          <div class="heroSub">eSIM — ${o.country.name}</div>
+        </div>
+
+        <div class="heroBtns">
+          <button class="heroBtn" id="repeatBtn">⟲ Повторить</button>
+          <button class="heroBtn" id="supportBtn">💬 Поддержка</button>
+        </div>
+
+        <div class="listCard">
+          <div class="kv">
+            <div class="kvRow">
+              <div class="k">Статус</div>
+              <div class="v st ${st.cls}"><span class="c">${st.cls==='good'?'✓':st.cls==='progress'?'…':'!'}</span> ${st.txt}</div>
+            </div>
+            <div class="kvRow">
+              <div class="k">Страна</div>
+              <div class="v">${o.country.name} <span class="chip">${o.country.code}</span></div>
+            </div>
+            <div class="kvRow">
+              <div class="k">Тариф</div>
+              <div class="v">${formatData(o.plan)} / ${o.plan.period} дн</div>
+            </div>
+            <div class="kvRow">
+              <div class="k">Сеть</div>
+              <div class="v">${o.plan.speed}</div>
+            </div>
+            <div class="kvRow">
+              <div class="k">Дата / Время</div>
+              <div class="v">${niceDate(o.createdAt)}</div>
+            </div>
+            <div class="kvRow">
+              <div class="k">Кошелек списания</div>
+              <div class="v">${o.wallet.name} <span class="chip">${(o.wallet.sub || '').trim() || ' '}</span></div>
+            </div>
+            <div class="kvRow">
+              <div class="k">Комиссия</div>
+              <div class="v">${o.feeUSD} USD</div>
+            </div>
+            <div class="kvRow">
+              <div class="k">Сумма</div>
+              <div class="v">${o.totalUSD} USD</div>
+            </div>
+            <div class="kvRow">
+              <div class="k">ID ордера</div>
+              <div class="v">${o.id.slice(0, 6)}… ${o.id.slice(-5)} <span class="chip" id="copyId" style="cursor:pointer">⧉</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+        <button class="btnPrimary solid" id="openGuide">Инструкция по установке eSIM</button>
+        ${isProgress ? `<div class="smallNote">Ссылка доступна уже на статусе “В процессе”.</div>` : ``}
+      `, `
+        <button class="bigClose" onclick="closeSheet()">Закрыть</button>
+      `);
+
+      $('#repeatBtn').addEventListener('click', ()=>{
+        state.esim.country = o.country;
+        state.esim.plan = o.plan;
+        state.esim.pay.wallet = null;
+        openEsimFlow('pay');
+      });
+
+      $('#supportBtn').addEventListener('click', ()=>{
+        openSheet('Поддержка', `
+          <div style="padding-top:8px">
+            <div class="listCard">
+              <div style="font-weight:1000">Чат поддержки (прототип)</div>
+              <div class="search" style="margin-top:12px">
+                <div class="sico">💬</div>
+                <input placeholder="Напишите сообщение…" />
+              </div>
+              <button class="btnPrimary solid" onclick="alert('Отправлено (демо)')">Отправить</button>
+            </div>
+          </div>
+        `);
+      });
+
+      const copy = $('#copyId');
+      if(copy){
+        copy.addEventListener('click', ()=>{
+          try{
+            navigator.clipboard.writeText(o.id);
+            copy.textContent = '✓';
+            setTimeout(()=>copy.textContent='⧉', 900);
+          }catch(e){
+            alert('Скопируйте вручную: ' + o.id);
+          }
+        });
+      }
+
+      $('#openGuide').addEventListener('click', ()=> openGuideStory(o));
+    }
+
+    function openGuideStory(order){
+      const stepsCommon = [
+        { h:'Перед началом', p:'Подключитесь к Wi‑Fi или стабильной сети. Убедитесь, что устройство обновлено.'},
+        { h:'QR‑код или код активации', p:'Отсканируйте QR‑код eSIM или добавьте вручную код активации (LPA) — как в инструкции ниже.'},
+        { h:'Выберите eSIM для данных', p:'Назначьте eSIM для “Сотовые данные / Mobile data”. При необходимости включите “Роуминг данных”.'},
+        { h:'Проверка', p:'Откройте сайт/приложение и убедитесь, что интернет работает. Если нет — перезагрузите устройство.'},
+      ];
+
+      const ios = [
+        { h:'Шаг 1', p:'Откройте: Настройки → Сотовая связь → Добавить eSIM.'},
+        { h:'Шаг 2', p:'Выберите “Использовать QR‑код”. Если QR нет — “Ввести данные вручную” и вставьте LPA/код активации.'},
+        { h:'Шаг 3', p:'Задайте имя линии (например, “Travel”), затем выберите eSIM для “Сотовые данные”.'},
+        ...stepsCommon,
+      ];
+      const android = [
+        { h:'Шаг 1', p:'Откройте: Настройки → Подключения/Сеть → SIM‑карты / eSIM → Добавить eSIM.'},
+        { h:'Шаг 2', p:'Сканируйте QR‑код eSIM. Если просит код — вставьте LPA‑строку.'},
+        { h:'Шаг 3', p:'Выберите eSIM как “Мобильные данные”. При необходимости включите “Роуминг данных”.'},
+        ...stepsCommon,
+      ];
+
+      const storyState = { os:'iphone', i:0, list: ios };
+
+      openSheet('Инструкция', `
+        <div style="padding-top:6px">
+          <div class="pillTabs">
+            <div class="pill active" data-guide="iphone">iPhone</div>
+            <div class="pill" data-guide="android">Android</div>
+          </div>
+
+          <div class="storyWrap">
+            <div class="storyTop">
+              <div class="storyTitle" id="stTitle">Шаг 1</div>
+              <div class="progressDots" id="stDots"></div>
+            </div>
+            <div class="storyBody">
+              <div class="stepH" id="stH"></div>
+              <div class="stepP" id="stP"></div>
+
+              <div class="storyNav">
+                <button class="btnGhost" id="prevStep">Назад</button>
+                <button class="btnNext" id="nextStep">Дальше</button>
+              </div>
+            </div>
+          </div>
+
+          <button class="btnPrimary" id="backToOrder" style="margin-top:12px">Вернуться к ордеру</button>
+        </div>
+      `);
+
+      const sets = { iphone: ios, android: android };
+
+      function renderStory(){
+        const list = storyState.list;
+        const i = storyState.i;
+
+        $('#stTitle').textContent = `Шаг ${i+1} из ${list.length}`;
+        $('#stH').textContent = list[i].h;
+        $('#stP').textContent = list[i].p;
+
+        const dots = $('#stDots');
+        dots.innerHTML = '';
+        for(let k=0;k<Math.min(list.length, 7);k++) {
+          const s = document.createElement('span');
+          if(k===Math.min(i, 6)) s.classList.add('on');
+          dots.appendChild(s);
+        }
+
+        $('#prevStep').disabled = i===0;
+        $('#nextStep').textContent = (i===list.length-1) ? 'Готово' : 'Дальше';
+      }
+
+      $('#prevStep').addEventListener('click', ()=>{
+        storyState.i = Math.max(0, storyState.i-1);
+        renderStory();
+      });
+      $('#nextStep').addEventListener('click', ()=>{
+        if(storyState.i >= storyState.list.length-1){
+          openOrderSheet(order.id);
+          return;
+        }
+        storyState.i += 1;
+        renderStory();
+      });
+
+      $$('[data-guide]').forEach(el=>{
+        el.addEventListener('click', ()=>{
+          $$('[data-guide]').forEach(x=>x.classList.remove('active'));
+          el.classList.add('active');
+          const g = el.getAttribute('data-guide');
+          storyState.os = g;
+          storyState.list = sets[g];
+          storyState.i = 0;
+          renderStory();
+        });
+      });
+
+      $('#backToOrder').addEventListener('click', ()=> openOrderSheet(order.id));
+
+      renderStory();
+    }
+
+    // --- utils
+    function formatData(p){
+      if(p.dataGB === -1) return 'Безлимит';
+      if(p.dataGB >= 1) return p.dataGB + 'GB';
+      return (p.dataGB*1024) + 'MB';
+    }
+    function shorten(s, n){
+      if(!s) return '';
+      s = String(s);
+      return s.length>n ? s.slice(0, n-1) + '…' : s;
+    }
+    function escapeAttr(s){
+      return String(s).replace(/"/g,'&quot;');
+    }
+
+    // init
+    function tickTime(){
+      const d = new Date();
+      $('#time').textContent = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+    }
+    tickTime();
+    setInterval(tickTime, 15000);
+
+    renderOps();
+  </script>
+</body>
+</html>
