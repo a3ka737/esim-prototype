@@ -141,41 +141,43 @@
       background:#fff;color:#545460;
     }
 
-    /* Баланс eSIM */
-    .esimBalanceCard{
+    /* eSIM balance card */
+    .esimBalanceWrapper{
       margin-top:12px;
+    }
+    .esimBalanceCard{
       background:var(--card);
-      border-radius: var(--radius-xl);
       border:1px solid var(--stroke);
-      padding: 12px 14px;
+      border-radius: var(--radius-xl);
+      padding: 10px 14px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
-      box-shadow: 0 6px 16px rgba(0,0,0,.02);
       cursor:pointer;
     }
-    .esimBalanceLeft{
+    .esimBalLeft{
       display:flex;align-items:center;gap:10px;min-width:0;
     }
-    .esimBalanceIcon{
-      width:34px;height:34px;border-radius:12px;
+    .esimBalIcon{
+      width:32px;height:32px;border-radius:12px;
       background: rgba(123,77,255,.12);
       border:1px solid rgba(123,77,255,.18);
       display:flex;align-items:center;justify-content:center;
-      color:var(--accent);font-weight:900;font-size:18px;
-      flex:0 0 auto;
+      color:var(--accent);font-weight:900;
     }
-    .esimBalanceTexts{min-width:0;}
-    .esimBalanceTexts .t1{font-weight:900;}
-    .esimBalanceTexts .t2{
+    .esimBalText{min-width:0;}
+    .esimBalTitle{font-weight:900;}
+    .esimBalSub{
       color:var(--muted);font-weight:800;font-size:13px;
       white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
     }
-    .esimBalanceRight{text-align:right;flex:0 0 auto;}
-    .esimBalanceAmount{font-weight:900;font-size:15px;}
-    .esimBalanceCur{color:var(--muted);font-weight:800;font-size:12px;margin-top:2px;}
-    .esimBalanceArrow{margin-top:4px;font-size:14px;opacity:.5;}
+    .esimBalRight{
+      display:flex;align-items:center;gap:8px;
+      font-weight:900;color:var(--muted);
+      flex:0 0 auto;
+      white-space:nowrap;
+    }
 
     .banner{
       margin-top: 14px;
@@ -343,10 +345,7 @@
     }
     .sheetHeader h3{margin:0;font-size:22px;font-weight:900}
     .close{
-      color:#2E8BFF;
-      font-weight:900;
-      cursor:pointer;
-      font-size:15px;
+      color:#2E8BFF;font-weight:900;cursor:pointer;
     }
     .sheetBody{
       padding: 0 18px 16px;
@@ -354,6 +353,7 @@
       -webkit-overflow-scrolling: touch;
       flex:1;
     }
+
     .search{
       border:1px solid var(--stroke);
       background:#FAFAFD;
@@ -367,6 +367,7 @@
       font-size:15px;font-weight:700;
     }
     .search .sico{opacity:.5;font-weight:900}
+
     .pillTabs{
       display:inline-flex;
       background:#F0F0F7;
@@ -394,12 +395,12 @@
       cursor:pointer;
     }
     .item + .item{border-top:1px solid var(--stroke)}
-    .item.selected{
-      background:#F4F0FF;
-      border-radius:14px;
-      margin:0 -12px;
-      padding-left:12px;
-      padding-right:12px;
+    .item.active{
+      background:rgba(123,77,255,.05);
+      border-radius: 14px;
+      margin:0 -4px;
+      padding-left:16px;
+      padding-right:16px;
     }
     .left{
       display:flex;align-items:center;gap:10px;min-width:0;
@@ -428,6 +429,7 @@
       font-weight:900;
     }
     .chev{opacity:.35;font-weight:900}
+
     .planCard{
       background:#fff;
       border:1px solid var(--stroke);
@@ -448,6 +450,7 @@
       color:var(--accent);
       white-space:nowrap;
     }
+
     .btnPrimary{
       width:100%;
       padding: 14px 14px;
@@ -477,6 +480,26 @@
       display:flex;align-items:center;justify-content:center;
       border:1px solid #D8D8E4;
       background:#fff;color:#9A9AAC;
+      flex:0 0 auto;
+      font-size:12px;font-weight:900;
+      margin-top:1px;
+    }
+
+    .warningCard{
+      margin-top:12px;
+      border-radius:16px;
+      padding:10px 12px;
+      background:#FFF8E5;
+      color:#8C6A1A;
+      font-size:13px;
+      font-weight:800;
+      display:flex;gap:8px;align-items:flex-start;
+    }
+    .warningCard .bang{
+      width:18px;height:18px;border-radius:999px;
+      display:flex;align-items:center;justify-content:center;
+      border:1px solid rgba(255,204,120,.9);
+      background:#FFE9BD;
       flex:0 0 auto;
       font-size:12px;font-weight:900;
       margin-top:1px;
@@ -550,6 +573,7 @@
     .st.progress .c{background: #7B4DFF}
     .st.bad{color:var(--bad)}
     .st.bad .c{background: var(--bad)}
+
     .bottomClose{
       padding: 14px 18px 18px;
       border-top:1px solid var(--stroke);
@@ -675,19 +699,19 @@
             </div>
           </div>
 
-          <!-- Баланс eSIM: только после первой покупки -->
-          <div id="esimBalanceContainer" class="esimBalanceCard" style="display:none;">
-            <div class="esimBalanceLeft">
-              <div class="esimBalanceIcon">📶</div>
-              <div class="esimBalanceTexts">
-                <div class="t1">Баланс eSIM</div>
-                <div class="t2">Проверка баланса и пополнение</div>
+          <div id="esimBalanceWrapper" class="esimBalanceWrapper" style="display:none;">
+            <div class="esimBalanceCard" id="esimBalanceTile">
+              <div class="esimBalLeft">
+                <div class="esimBalIcon">📶</div>
+                <div class="esimBalText">
+                  <div class="esimBalTitle">Баланс eSIM</div>
+                  <div class="esimBalSub">Проверка баланса и пополнение</div>
+                </div>
               </div>
-            </div>
-            <div class="esimBalanceRight">
-              <div class="esimBalanceAmount">0.00 USD</div>
-              <div class="esimBalanceCur">доступно</div>
-              <div class="esimBalanceArrow">›</div>
+              <div class="esimBalRight">
+                <span id="esimBalanceAmount">0.00 USD</span>
+                <span class="chev">›</span>
+              </div>
             </div>
           </div>
 
@@ -722,12 +746,10 @@
             <div class="date" id="opsDate">08 февраля</div>
           </div>
 
-          <div class="listCard" id="opsList">
-            <!-- operations injected -->
-          </div>
+          <div class="listCard" id="opsList"></div>
 
           <div style="height:16px"></div>
-          <div class="smallNote">Прототип: Главная → Сервисы → eSIM (bottom-sheet) + Баланс eSIM после первой покупки.</div>
+          <div class="smallNote">Прототип: Главная → Сервисы → eSIM (bottom-sheet в стиле вашего приложения).</div>
           <div style="height:26px"></div>
         </div>
 
@@ -761,7 +783,6 @@
   </div>
 
   <script>
-    // --- tiny helpers
     const $ = (s, p=document)=>p.querySelector(s);
     const $$ = (s, p=document)=>Array.from(p.querySelectorAll(s));
     const overlay = $('#overlay');
@@ -775,20 +796,18 @@
       esim: {
         country: null,
         plan: null,
-        check: { os: 'all', model: '', supported: null },
+        check: { os:'all', model:'', supported:null },
         pay: { wallet: null },
       },
-      esimBalance: {
-        savedNumber: null,
-      },
-      orders: []
+      orders: [],
+      esimSavedNumber: null,
     };
 
-    // Seed operations like ваши скрины
     const now = new Date();
     const fmtDate = (d)=> String(d.getDate()).padStart(2,'0') + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + d.getFullYear();
     const fmtTime = (d)=> String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
     const niceDate = (d)=> fmtDate(d) + ', ' + fmtTime(d);
+    $('#opsDate').textContent = fmtDate(now);
 
     const opsSeed = [
       {
@@ -821,10 +840,10 @@
 
     const countries = [
       { name:'Турция', slug:'turkey', priceFrom: '6.14', code:'TR' },
-      { name:'ОАЭ', slug:'united-arab-emirates', priceFrom: '7.28', code:'AE' },
+      { name:'ОАЭ', slug:'uae', priceFrom: '7.28', code:'AE' },
       { name:'Таиланд', slug:'thailand', priceFrom: '6.20', code:'TH' },
       { name:'Египет', slug:'egypt', priceFrom: '8.12', code:'EG' },
-      { name:'США', slug:'united-states', priceFrom: '5.99', code:'US' },
+      { name:'США', slug:'usa', priceFrom: '5.99', code:'US' },
       { name:'Германия', slug:'germany', priceFrom: '4.90', code:'DE' },
     ];
 
@@ -832,20 +851,20 @@
       turkey: [
         { id: 1101, name:'Турция 1GB 7 дней', period:7, dataGB:1, type:'DATA', fup:'', speed:'4G/5G', operator:'Turkcell', price:'6.20' },
         { id: 1102, name:'Турция 3GB 15 дней', period:15, dataGB:3, type:'DATA', fup:'', speed:'4G', operator:'Vodafone TR', price:'10.90' },
-        { id: 1103, name:'Турция 500MB/день 7 дней', period:7, dataGB:-1, type:'DATA', fup:'500MB high-speed/day, затем сниженная скорость, обновляется ежедневно', speed:'4G', operator:'Turk Telekom', price:'7.80' },
+        { id: 1103, name:'Турция 500MB/день 7 дней', period:7, dataGB:-1, type:'DATA', fup:'500MB high-speed/день, затем сниженная скорость', speed:'4G', operator:'Turk Telekom', price:'7.80' },
       ],
       thailand: [
         { id: 1201, name:'Таиланд 1GB 7 дней', period:7, dataGB:1, type:'DATA', fup:'', speed:'4G/5G', operator:'AIS', price:'6.20' },
         { id: 1202, name:'Таиланд 5GB 30 дней', period:30, dataGB:5, type:'DATA', fup:'', speed:'4G', operator:'DTAC', price:'14.90' },
       ],
-      'united-arab-emirates': [
+      uae: [
         { id: 1301, name:'ОАЭ 2GB 15 дней', period:15, dataGB:2, type:'DATA', fup:'', speed:'4G/5G', operator:'Etisalat', price:'9.60' },
         { id: 1302, name:'ОАЭ 10GB 30 дней', period:30, dataGB:10, type:'DATA', fup:'', speed:'5G', operator:'du', price:'24.15' },
       ],
       egypt: [
         { id: 1401, name:'Египет 1GB 7 дней', period:7, dataGB:1, type:'DATA', fup:'', speed:'4G', operator:'Orange EG', price:'8.12' },
       ],
-      'united-states': [
+      usa: [
         { id: 1501, name:'США 3GB 30 дней', period:30, dataGB:3, type:'DATA', fup:'', speed:'4G/5G', operator:'T-Mobile', price:'11.90' },
         { id: 1502, name:'США Unlimited 7 дней', period:7, dataGB:-1, type:'DATA', fup:'Политика честного использования: скорость может быть снижена после большого объёма трафика', speed:'5G', operator:'AT&T', price:'19.90' },
       ],
@@ -854,9 +873,15 @@
       ],
     };
 
-    // Список моделей Apple с eSIM (из твоего списка)
-    const appleEsimModels = [
-      'iPhone 17','iPhone 17 Pro','iPhone 17 Pro Max','IPhone 17 Air',
+    const wallets = [
+      { id:'rub',  name:'RUB',          sub:'Москва', icon:'₽', balance:'100 000.29 RUB' },
+      { id:'usdt', name:'USDT TRC-20',  sub:'TRC-20', icon:'₮', balance:'0.05 USDT' },
+      { id:'eur',  name:'EUR',          sub:'',       icon:'€', balance:'120.40 EUR' },
+      { id:'usd',  name:'USD',          sub:'',       icon:'$', balance:'0.00 USD' },
+    ];
+
+    const iphoneEsimModels = [
+      'iPhone 17','iPhone 17 Pro','iPhone 17 Pro Max','iPhone 17 Air',
       'iPhone 16','iPhone 16 Pro','iPhone 16 Pro Max',
       'iPhone 15','iPhone 15 Plus','iPhone 15 Pro','iPhone 15 Pro Max',
       'iPhone 14','iPhone 14 Plus','iPhone 14 Pro','iPhone 14 Pro Max',
@@ -872,21 +897,44 @@
       'iPad Mini (5th generation)','iPad Mini (6th generation)'
     ];
 
-    // Просто примерные поддерживаемые Android
-    const androidEsimModels = [
-      'Samsung Galaxy S22','Samsung Galaxy S23 Ultra',
-      'Google Pixel 7','Google Pixel 8 Pro',
-      'Xiaomi 13','OnePlus 11','Huawei P40 Pro'
-    ];
+    const esimTips = {
+      ios: 'На iOS (iPhone): Перейдите в «Настройки» → «Сотовая связь» или «Основные» → «Об этом устройстве». Номер eSIM будет указан в разделе «Цифровая SIM-карта» или в списке номеров.',
+      android: 'На Android: Откройте «Настройки» → «Сеть и интернет» (или «Подключения») → «Диспетчер SIM-карт» или «SIM-карты».'
+    };
 
-    const wallets = [
-      { id:'rub',  name:'RUB',          sub:'Москва',   icon:'₽', balance:'100 000.29 RUB' },
-      { id:'usdt', name:'USDT TRC-20',  sub:'TRC-20',   icon:'₮', balance:'0.05 USDT' },
-      { id:'usd',  name:'USD',          sub:'Счёт USD', icon:'$', balance:'24.15 USD' },
-      { id:'eur',  name:'EUR',          sub:'Европа',   icon:'€', balance:'120.40 EUR' },
-    ];
+    function formatData(p){
+      if(p.dataGB === -1) return 'Безлимит';
+      if(p.dataGB >= 1) return p.dataGB + 'GB';
+      return (p.dataGB*1024) + 'MB';
+    }
+    function shorten(s, n){
+      if(!s) return '';
+      s = String(s);
+      return s.length>n ? s.slice(0, n-1) + '…' : s;
+    }
+    function money(n){
+      return Number(n).toFixed(2);
+    }
 
-    // Render operations list
+    function getWalletCurrency(w){
+      if(!w) return 'USD';
+      if(w.id === 'rub') return 'RUB';
+      if(w.id === 'eur') return 'EUR';
+      if(w.id === 'usdt') return 'USDT';
+      if(w.id === 'usd') return 'USD';
+      return (w.name || 'USD').toUpperCase();
+    }
+    function getFxInfo(priceUsd, wallet){
+      const cur = getWalletCurrency(wallet);
+      let perUsd = 1;
+      if(cur === 'RUB') perUsd = 78;
+      else if(cur === 'EUR') perUsd = 0.92;
+      else if(cur === 'USDT') perUsd = 1;
+      else if(cur === 'USD') perUsd = 1;
+      const walletAmount = priceUsd * perUsd;
+      return { currency: cur, perUsd, walletAmount, priceUsd };
+    }
+
     function renderOps(){
       const list = $('#opsList');
       const all = [...state.orders].sort((a,b)=>b.createdAt - a.createdAt);
@@ -913,42 +961,17 @@
           if(ord) openOrderSheet(ord.id);
         });
       });
+      updateEsimBalanceTileVisibility();
     }
 
     function hasEsimOrders(){
-      return state.orders.some(o => o.type === 'esim');
+      return state.orders.some(o=>o.type === 'esim');
     }
-
-    function renderEsimAssets(){
-      const box = $('#esimBalanceContainer');
-      if(!box) return;
-      box.style.display = hasEsimOrders() ? 'flex' : 'none';
+    function updateEsimBalanceTileVisibility(){
+      const wrap = $('#esimBalanceWrapper');
+      if(!wrap) return;
+      wrap.style.display = hasEsimOrders() ? 'block' : 'none';
     }
-
-    // tabs
-    $$('.tab').forEach(t=>{
-      t.addEventListener('click', ()=>{
-        $$('.tab').forEach(x=>x.classList.remove('active'));
-        t.classList.add('active');
-        state.currentTab = t.getAttribute('data-tab');
-        if(state.currentTab!=='home'){
-          openInfoSheet(state.currentTab);
-        }
-      });
-    });
-
-    // services
-    $$('[data-open="esim"]').forEach(el=>{
-      el.addEventListener('click', ()=> openEsimFlow('country'));
-    });
-
-    const esimBalanceCard = $('#esimBalanceContainer');
-    if (esimBalanceCard){
-      esimBalanceCard.addEventListener('click', openEsimBalanceFlow);
-    }
-
-    $('#sheetClose').addEventListener('click', closeSheet);
-    overlay.addEventListener('click', closeSheet);
 
     function openSheet(title, bodyHTML, bottomHTML=null){
       sheetTitle.textContent = title;
@@ -968,7 +991,35 @@
       sheet.classList.remove('show');
     }
 
-    // --- Flow screens
+    $('#sheetClose').addEventListener('click', closeSheet);
+    overlay.addEventListener('click', closeSheet);
+
+    $$('.tab').forEach(t=>{
+      t.addEventListener('click', ()=>{
+        $$('.tab').forEach(x=>x.classList.remove('active'));
+        t.classList.add('active');
+        state.currentTab = t.getAttribute('data-tab');
+        if(state.currentTab!=='home'){
+          openInfoSheet(state.currentTab);
+        }
+      });
+    });
+
+    $$('[data-open="esim"]').forEach(el=>{
+      el.addEventListener('click', ()=> openEsimFlow('country'));
+    });
+
+    const esimTile = $('#esimBalanceTile');
+    if(esimTile){
+      esimTile.addEventListener('click', ()=>{
+        if(state.esimSavedNumber){
+          openEsimBalanceResult(state.esimSavedNumber);
+        }else{
+          openEsimBalanceEnter(false);
+        }
+      });
+    }
+
     function openInfoSheet(tab){
       const titles = { p2p:'P2P', chat:'Чат', settings:'Настройки' };
       openSheet(titles[tab] || 'Раздел', `
@@ -979,7 +1030,6 @@
               <div class="chip">demo</div>
             </div>
             <div class="smallNote" style="margin-top:10px">
-              Этот экран здесь только чтобы сохранить “настоящую” нижнюю навигацию.
               Основной флоу — Главная → Сервисы → eSIM.
             </div>
           </div>
@@ -1046,6 +1096,7 @@
 
     function renderPlansStep(){
       const c = state.esim.country;
+      if(!c) return renderCountryStep();
       const plans = plansByCountry[c.slug] || [];
       const body = `
         <div style="padding-top:6px">
@@ -1091,14 +1142,16 @@
       });
     }
 
-    // Новый экран "Проверка устройства"
     function renderCompatStep(){
+      const c = state.esim.country;
+      const p = state.esim.plan;
+      if(!c || !p) return openEsimFlow('country');
+
       openSheet('Проверка устройства', `
         <div style="padding-top:6px">
           <div class="listCard" style="margin-bottom:12px">
-            <div style="font-weight:1000">Проверка устройства</div>
             <div class="smallNote">
-              Необязательный шаг: можно сразу перейти к покупке eSIM.
+              Проверьте, поддерживает ли ваше устройство eSIM. Можно пропустить шаг и сразу купить eSIM.
             </div>
           </div>
 
@@ -1111,136 +1164,76 @@
 
             <div class="search" style="margin-top:10px">
               <div class="sico">⌕</div>
-              <input id="modelSearch" placeholder="Модель устройства, например: iPhone 15 Pro" />
+              <input id="deviceSearch" placeholder="Найдите модель, например: iPhone 13" />
             </div>
 
-            <div class="smallNote" style="margin-top:4px">
-              Начните вводить модель — подсветим устройства с поддержкой eSIM.
-            </div>
-
-            <div id="modelsList" style="margin-top:6px"></div>
+            <div id="deviceList"></div>
           </div>
 
           <div style="height:12px"></div>
           <div class="heroBtns" style="grid-template-columns:1fr 1fr">
-            <button class="btnGhost" id="deviceSkip">Пропустить</button>
-            <button class="btnNext" id="deviceBuy">Купить eSIM</button>
+            <button class="btnGhost" id="compatSkip">Пропустить</button>
+            <button class="btnNext" id="compatNext">Купить eSIM</button>
           </div>
         </div>
       `);
 
-      const searchInput = $('#modelSearch');
-      const modelsList = $('#modelsList');
+      const listEl = $('#deviceList');
+      const input = $('#deviceSearch');
+      state.esim.check.os = 'all';
 
-      let currentOs = 'all';
+      function paintDevices(){
+        const os = state.esim.check.os;
+        const q = (input.value || '').trim().toLowerCase();
 
-      function buildModels(os, q){
-        const query = (q || '').trim().toLowerCase();
-        let list = [];
-
-        const mk = (name, platform, supported=true)=>({name, platform, supported});
-
-        const apple = appleEsimModels.map(name=>mk(name, 'iPhone', true));
-        const android = androidEsimModels.map(name=>mk(name, 'Android', true));
-
-        if(os==='iphone') list = apple;
-        else if(os==='android') list = android;
-        else list = [...apple, ...android];
-
-        if(query){
-          list = list.filter(x=>x.name.toLowerCase().includes(query));
-        }
-
-        list = list.slice(0, 30);
-
-        if(!list.length){
-          modelsList.innerHTML = '<div class="smallNote">Мы не нашли такую модель. Возможно, eSIM не поддерживается. Можно всё равно продолжить покупку.</div>';
+        if(os === 'android'){
+          listEl.innerHTML = `<div class="smallNote">Для прототипа список моделей подготовлен только для iPhone. Для Android используйте инструкцию от производителя.</div>`;
           return;
         }
 
-        modelsList.innerHTML = list.map(m => `
-          <div class="item modelItem" data-model="${m.name}" data-supported="${m.supported ? '1':'0'}">
+        let models = iphoneEsimModels;
+        let filtered = models.filter(m=>!q || m.toLowerCase().includes(q));
+        if(!filtered.length){
+          listEl.innerHTML = `<div class="smallNote">Ничего не найдено. Попробуйте изменить запрос.</div>`;
+          return;
+        }
+        listEl.innerHTML = filtered.map(model=>`
+          <div class="item" data-model="${model}">
             <div class="left">
               <div class="flag">📱</div>
               <div class="tt">
-                <div class="t1">${m.name}</div>
-                <div class="t2">${m.platform}</div>
+                <div class="t1">${model}</div>
+                <div class="t2">Поддерживает eSIM</div>
               </div>
             </div>
-            <div class="right">
-              <span class="st ${m.supported ? 'good':'bad'}">
-                <span class="c">${m.supported ? '✓':'!'}</span> eSIM
-              </span>
-            </div>
+            <div class="right"><span class="chev">✓</span></div>
           </div>
         `).join('');
-
-        $$('.modelItem', modelsList).forEach(el=>{
+        $$('[data-model]').forEach(el=>{
           el.addEventListener('click', ()=>{
-            $$('.modelItem', modelsList).forEach(x=>x.classList.remove('selected'));
-            el.classList.add('selected');
-            state.esim.check.model = el.getAttribute('data-model');
-            state.esim.check.supported = el.getAttribute('data-supported') === '1';
+            $$('[data-model]').forEach(x=>x.classList.remove('active'));
+            el.classList.add('active');
+            const model = el.getAttribute('data-model');
+            state.esim.check.model = model;
+            state.esim.check.supported = true;
           });
         });
       }
-
-      buildModels(currentOs, '');
-
-      searchInput.addEventListener('input', ()=> buildModels(currentOs, searchInput.value));
 
       $$('[data-os]').forEach(el=>{
         el.addEventListener('click', ()=>{
           $$('[data-os]').forEach(x=>x.classList.remove('active'));
           el.classList.add('active');
-          currentOs = el.getAttribute('data-os');
-          buildModels(currentOs, searchInput.value);
+          state.esim.check.os = el.getAttribute('data-os');
+          paintDevices();
         });
       });
 
-      $('#deviceSkip').addEventListener('click', ()=> openEsimFlow('pay'));
-      $('#deviceBuy').addEventListener('click', ()=> openEsimFlow('pay'));
-    }
+      input.addEventListener('input', paintDevices);
+      paintDevices();
 
-    function renderPayStep(){
-      const c = state.esim.country;
-      const p = state.esim.plan;
-
-      openSheet('Оплата', `
-        <div style="padding-top:6px">
-          <div class="listCard" style="margin-bottom:12px">
-            <div class="row">
-              <div style="font-weight:1000">${c.name}</div>
-              <div class="chip">${formatData(p)} • ${p.period} дн</div>
-            </div>
-            <div class="smallNote" style="margin-top:10px">
-              Оплатить можно с любого кошелька: RUB, USD, USDT или EUR.
-              Конвертацию сделаем “под капотом”.
-            </div>
-          </div>
-
-          <div class="listCard" id="walletBox">
-            ${renderWalletSelected()}
-          </div>
-
-          <div style="height:12px"></div>
-          <button class="btnPrimary solid" id="payBtn" ${state.esim.pay.wallet ? '' : 'disabled'}>Продолжить</button>
-
-          <div class="hint">
-            <div class="bang">!</div>
-            <div>В прототипе баланс/комиссии условные. В реальном продукте — берём из кошельков и курса обмена.</div>
-          </div>
-
-          <button class="btnPrimary" id="backToPlans">Назад к тарифам</button>
-        </div>
-      `);
-
-      $('#walletBox').addEventListener('click', ()=> openWalletPicker());
-
-      $('#backToPlans').addEventListener('click', ()=> openEsimFlow('plans'));
-      $('#payBtn').addEventListener('click', ()=>{
-        createEsimOrder();
-      });
+      $('#compatSkip').addEventListener('click', ()=> openEsimFlow('pay'));
+      $('#compatNext').addEventListener('click', ()=> openEsimFlow('pay'));
     }
 
     function renderWalletSelected(){
@@ -1248,12 +1241,9 @@
       if(!w){
         return `
           <div class="row">
-            <div class="left">
-              <div class="flag">💼</div>
-              <div class="tt">
-                <div class="t1">Выберите кошелек</div>
-                <div class="t2">RUB, USD, USDT или EUR</div>
-              </div>
+            <div class="tt">
+              <div class="t1">Кошелёк списания</div>
+              <div class="t2">Выберите кошелёк</div>
             </div>
             <div class="right"><span class="chev">›</span></div>
           </div>
@@ -1271,6 +1261,47 @@
           <div class="right"><span class="chev">›</span></div>
         </div>
       `;
+    }
+
+    function renderPayStep(){
+      const c = state.esim.country;
+      const p = state.esim.plan;
+      if(!c || !p) return openEsimFlow('country');
+
+      openSheet('Оплата', `
+        <div style="padding-top:6px">
+          <div class="listCard" style="margin-bottom:12px">
+            <div class="row">
+              <div>
+                <div style="font-weight:1000">${c.name}</div>
+                <div class="smallNote" style="margin-top:4px">${formatData(p)} • ${p.period} дн • ${p.speed}</div>
+              </div>
+              <div class="price">${p.price} USD</div>
+            </div>
+          </div>
+
+          <div class="listCard" id="walletBox">
+            ${renderWalletSelected()}
+          </div>
+
+          <div style="height:12px"></div>
+          <button class="btnPrimary solid" id="payBtn" ${state.esim.pay.wallet ? '' : 'disabled'}>Продолжить</button>
+        </div>
+      `);
+
+      $('#walletBox').addEventListener('click', ()=> openWalletPicker());
+
+      $('#payBtn').addEventListener('click', ()=>{
+        const w = state.esim.pay.wallet;
+        if(!w) return;
+        const priceUsd = parseFloat(p.price);
+        const fx = getFxInfo(priceUsd, w);
+        if(fx.currency === 'USD'){
+          createEsimOrder(false, fx);
+        }else{
+          openExchangeScreen(fx);
+        }
+      });
     }
 
     function openWalletPicker(){
@@ -1317,10 +1348,75 @@
       paint('');
     }
 
-    function createEsimOrder(){
+    function openExchangeScreen(fx){
       const c = state.esim.country;
       const p = state.esim.plan;
       const w = state.esim.pay.wallet;
+      if(!c || !p || !w) return;
+
+      const walletAmt = money(fx.walletAmount);
+      const priceUsd = money(fx.priceUsd);
+
+      openSheet('Оплата', `
+        <div style="padding-top:6px">
+          <div class="listCard" style="margin-bottom:12px">
+            <div class="row">
+              <div class="left">
+                <div class="flag">${w.icon}</div>
+                <div class="tt">
+                  <div class="t1">${w.name}</div>
+                  <div class="t2">${w.balance}</div>
+                </div>
+              </div>
+              <div class="right">
+                <span>${walletAmt} ${fx.currency}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="listCard" style="margin-bottom:12px">
+            <div class="kvRow">
+              <div class="k">Сумма</div>
+              <div class="v">${walletAmt} ${fx.currency}</div>
+            </div>
+            <div class="kvRow">
+              <div class="k">Курс</div>
+              <div class="v">${money(fx.perUsd)} ${fx.currency} ≈ 1 USD</div>
+            </div>
+          </div>
+
+          <div class="listCard">
+            <div class="kvRow">
+              <div class="k">Обмен</div>
+              <div class="v">${walletAmt} ${fx.currency} → ${priceUsd} USD</div>
+            </div>
+          </div>
+
+          <div class="warningCard">
+            <div class="bang">!</div>
+            <div>
+              Для оплаты с ${fx.currency === 'USDT' ? 'крипто-кошелька' : 'фиатного кошелька'} потребуется совершить автоматический обмен.
+            </div>
+          </div>
+
+          <div style="height:12px"></div>
+          <button class="btnPrimary solid" id="confirmExchange">Продолжить</button>
+        </div>
+      `);
+
+      $('#confirmExchange').addEventListener('click', ()=>{
+        createEsimOrder(true, fx);
+      });
+    }
+
+    function createEsimOrder(fromExchange, fx){
+      const c = state.esim.country;
+      const p = state.esim.plan;
+      const w = state.esim.pay.wallet;
+      if(!c || !p || !w) return;
+
+      const priceUsd = parseFloat(p.price);
+      const fxInfo = fx || getFxInfo(priceUsd, w);
 
       const id = 'ord_' + Math.random().toString(16).slice(2, 10);
       const createdAt = new Date();
@@ -1330,7 +1426,7 @@
         title: 'eSIM',
         subtitle: `${c.name} • ${formatData(p)} • ${p.period} дн`,
         tag: '',
-        amount: `-${p.price} ${w.id==='rub' ? 'RUB (конв.)' : w.name.includes('USDT') ? 'USDT' : w.name}`,
+        amount: `-${money(fxInfo.walletAmount)} ${fxInfo.currency}`,
         amountClass: '',
         icon: '📶',
         mini: '↗',
@@ -1340,23 +1436,21 @@
         country: c,
         plan: p,
         wallet: w,
-        total: p.price,
+        totalUsd: money(priceUsd),
         fee: '0.00',
-        orderNumber: id.toUpperCase().slice(0, 10),
       };
 
       state.orders.unshift(order);
       renderOps();
-      renderEsimAssets();
       openOrderSheet(id);
 
-      // simulate processing -> done
       setTimeout(()=>{
         const o = state.orders.find(x=>x.id===id);
         if(!o) return;
         o.status = 'done';
         renderOps();
-      }, 4500);
+        // если открыт ордер — можно перерендерить, но для прототипа оставляем как есть
+      }, 5500);
     }
 
     function openOrderSheet(orderId){
@@ -1369,13 +1463,10 @@
                  (o.status==='refund') ? {cls:'bad', txt:'Возврат'} :
                  {cls:'progress', txt:'В процессе'};
 
-      const heroAmt = o.plan.price;
-      const currency = 'USD';
-
       openSheet('eSIM', `
         <div class="hero">
           <div class="heroIco">📶<div class="mini">↗</div></div>
-          <div class="heroAmt">${heroAmt}<small> ${currency}</small></div>
+          <div class="heroAmt">${o.totalUsd}<small> USD</small></div>
           <div class="heroSub">eSIM — ${o.country.name}</div>
         </div>
 
@@ -1416,11 +1507,11 @@
             </div>
             <div class="kvRow">
               <div class="k">Комиссия</div>
-              <div class="v">${o.fee} ${currency}</div>
+              <div class="v">${o.fee} USD</div>
             </div>
             <div class="kvRow">
               <div class="k">Сумма</div>
-              <div class="v">${o.total} ${currency}</div>
+              <div class="v">${o.totalUsd} USD</div>
             </div>
             <div class="kvRow">
               <div class="k">ID ордера</div>
@@ -1429,14 +1520,8 @@
           </div>
         </div>
 
-        ${isProgress ? `
-          <div style="height:12px"></div>
-          <button class="btnPrimary solid" id="openGuide">Инструкция по установке eSIM</button>
-          <div class="smallNote">Ссылка появляется уже на статусе “В процессе”.</div>
-        ` : `
-          <div style="height:12px"></div>
-          <button class="btnPrimary" id="openGuide">Инструкция по установке eSIM</button>
-        `}
+        <div style="height:12px"></div>
+        <button class="btnPrimary" id="openGuide">Инструкция по установке eSIM</button>
       `, `
         <button class="bigClose" onclick="closeSheet()">Закрыть</button>
       `);
@@ -1454,7 +1539,7 @@
             <div class="listCard">
               <div style="font-weight:1000">Чат поддержки (прототип)</div>
               <div class="smallNote" style="margin-top:10px">
-                В боевой версии: привязываем к ордеру и открываем диалог с готовыми “быстрыми вопросами”.
+                В боевой версии привязываем обращение к этому ордеру.
               </div>
               <div class="search" style="margin-top:12px">
                 <div class="sico">💬</div>
@@ -1484,27 +1569,27 @@
 
     function openGuideStory(order){
       const stepsCommon = [
-        { h:'Перед началом', p:'Подключитесь к Wi-Fi или стабильной сети. Убедитесь, что устройство обновлено и не стоит ограничение на установку eSIM.'},
+        { h:'Перед началом', p:'Подключитесь к Wi-Fi или стабильной сети. Убедитесь, что устройство обновлено и нет ограничений на установку eSIM.'},
         { h:'Установка профиля', p:'Отсканируйте QR-код eSIM или добавьте вручную код активации (LPA). Следуйте подсказкам на экране.'},
-        { h:'Активация и данные', p:'Включите линию eSIM, задайте ей имя (например «Travel») и выберите eSIM для «Сотовые данные».'},
-        { h:'Проверка', p:'Откройте браузер или приложение — проверьте, что интернет работает. Если нет — перезагрузите устройство и проверьте APN/роуминг.'},
+        { h:'Активация и данные', p:'Включите линию eSIM, задайте ей имя (например «Travel») и выберите eSIM для мобильного интернета.'},
+        { h:'Проверка', p:'Откройте браузер или приложение и убедитесь, что интернет работает. Если нет — перезагрузите устройство и проверьте настройки APN/роуминга.'},
       ];
 
       const ios = [
         { h:'iPhone: где найти eSIM', p:'Настройки → Сотовая связь → Добавить eSIM.'},
-        { h:'iPhone: QR / вручную', p:'Выберите «Использовать QR-код». Если QR нет — «Ввести данные вручную» и вставьте код активации.'},
-        { h:'iPhone: выбрать данные', p:'Настройки → Сотовая связь → Сотовые данные → выберите eSIM. При необходимости включите «Роуминг данных».'},
+        { h:'QR-код или код', p:'Выберите «Использовать QR-код». Если его нет — «Ввести данные вручную» и вставьте код активации eSIM.'},
+        { h:'Линия для данных', p:'Настройки → Сотовая связь → Сотовые данные → выберите eSIM. При необходимости включите «Роуминг данных».'},
         ...stepsCommon,
       ];
-
       const android = [
-        { h:'Android: где найти eSIM', p:'Настройки → Сеть и Интернет (или «Подключения») → SIM-карты / eSIM → Добавить eSIM.'},
-        { h:'Android: QR / код', p:'Сканируйте QR-код eSIM. Если просит код активации — вставьте LPA-строку.'},
-        { h:'Android: выбрать данные', p:'Выберите eSIM как «Мобильные данные». При необходимости включите «Роуминг данных».'},
+        { h:'Android: где найти eSIM', p:'Настройки → Сеть и Интернет (или Подключения) → SIM-карты / eSIM → Добавить eSIM.'},
+        { h:'QR-код или LPA', p:'Сканируйте QR-код или введите LPA-строку вручную, если это требуется.'},
+        { h:'Линия для данных', p:'Выберите eSIM как источник мобильных данных. При необходимости включите роуминг.'},
         ...stepsCommon,
       ];
 
       const storyState = { os:'iphone', i:0, list: ios };
+      const sets = { iphone: ios, android: android };
 
       openSheet('Инструкция', `
         <div style="padding-top:6px">
@@ -1529,16 +1614,9 @@
             </div>
           </div>
 
-          <div class="hint">
-            <div class="bang">!</div>
-            <div>Это «история» вместо длинной страницы. В боевой версии шаги берем из финальных текстов.</div>
-          </div>
-
-          <button class="btnPrimary" onclick="openOrderSheet('${order.id}')">Вернуться к ордеру</button>
+          <button class="btnPrimary" style="margin-top:14px" onclick="openOrderSheet('${order.id}')">Вернуться к ордеру</button>
         </div>
       `);
-
-      const sets = { iphone: ios, android: android };
 
       function renderStory(){
         const list = storyState.list;
@@ -1564,7 +1642,6 @@
         storyState.i = Math.max(0, storyState.i-1);
         renderStory();
       });
-
       $('#nextStep').addEventListener('click', ()=>{
         if(storyState.i >= storyState.list.length-1){
           openOrderSheet(order.id);
@@ -1588,150 +1665,107 @@
 
       renderStory();
     }
-    // --- Баланс eSIM
 
-    function openEsimBalanceFlow(){
-      if(state.esimBalance.savedNumber){
-        renderEsimBalanceView(state.esimBalance.savedNumber);
-      }else{
-        renderEsimBalanceEnter();
-      }
-    }
-
-    function renderEsimBalanceEnter(){
-      const iosHelp = 'На iOS (iPhone): Перейдите в «Настройки» → «Сотовая связь» или «Основные» → «Об этом устройстве». Ваш номер будет указан в разделе «Цифровая SIM-карта» или в списке номеров.';
-      const androidHelp = 'На Android: Откройте «Настройки» → «Сеть и интернет» (или «Подключения») → «Диспетчер SIM-карт» или «SIM-карты».';
-
+    function openEsimBalanceEnter(prefill){
       openSheet('Баланс eSIM', `
         <div style="padding-top:6px">
-          <div class="listCard">
-            <div style="font-weight:1000;margin-bottom:8px">Введите номер eSIM</div>
-            <div class="search" style="margin-top:0">
+          <div class="listCard" style="margin-bottom:12px">
+            <div class="smallNote" style="margin-top:0;margin-bottom:6px;">Введите номер eSIM</div>
+            <div class="search" style="margin:6px 0 10px;">
               <div class="sico">#</div>
-              <input id="esimNumberInput" placeholder="Например: 123456789100000" inputmode="numeric" />
+              <input id="esimNumberInput" placeholder="12345678900" />
             </div>
-
-            <label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;font-weight:800;color:#55556A;">
-              <input type="checkbox" id="rememberEsimCheckbox" style="width:16px;height:16px" />
-              <span>Запомнить номер eSIM</span>
+            <label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:13px;">
+              <input type="checkbox" id="rememberEsim" style="margin-top:3px;width:16px;height:16px" />
+              <span style="font-weight:800;">Запомнить номер eSIM</span>
             </label>
-
-            <div class="hint" style="margin-top:12px">
-              <div class="bang">?</div>
-              <div>Чтобы узнать номер eSIM, воспользуйтесь инструкцией ниже — выберите тип устройства.</div>
-            </div>
-
-            <div class="pillTabs" id="esimHelpTabs">
-              <div class="pill active" data-esimhelp="ios">iOS</div>
-              <div class="pill" data-esimhelp="android">Android</div>
-            </div>
-            <div class="smallNote" id="esimHelpText">${iosHelp}</div>
-
-            <div style="height:12px"></div>
-            <button class="btnPrimary solid" id="esimBalanceContinue" disabled>Продолжить</button>
           </div>
+
+          <div class="listCard">
+            <div style="font-weight:1000;margin-bottom:8px;">Как узнать номер eSIM?</div>
+            <div class="pillTabs" style="margin-bottom:8px;">
+              <div class="pill active" data-esim-tip="ios">iOS</div>
+              <div class="pill" data-esim-tip="android">Android</div>
+            </div>
+            <div class="smallNote" id="esimTipText" style="margin-top:4px;">${esimTips.ios}</div>
+          </div>
+
+          <div style="height:12px"></div>
+          <button class="btnPrimary solid" id="esimBalanceContinue">Продолжить</button>
         </div>
       `);
 
       const input = $('#esimNumberInput');
-      const remember = $('#rememberEsimCheckbox');
-      const btn = $('#esimBalanceContinue');
-      const helpTextEl = $('#esimHelpText');
+      const remember = $('#rememberEsim');
+      if(prefill && state.esimSavedNumber){
+        input.value = state.esimSavedNumber;
+        remember.checked = true;
+      }
 
-      input.addEventListener('input', ()=>{
-        btn.disabled = !input.value.trim();
-      });
-
-      $$('[data-esimhelp]').forEach(el=>{
+      $$('[data-esim-tip]').forEach(el=>{
         el.addEventListener('click', ()=>{
-          $$('[data-esimhelp]').forEach(x=>x.classList.remove('active'));
+          $$('[data-esim-tip]').forEach(x=>x.classList.remove('active'));
           el.classList.add('active');
-          const t = el.getAttribute('data-esimhelp');
-          helpTextEl.textContent = (t === 'android') ? androidHelp : iosHelp;
+          const t = el.getAttribute('data-esim-tip');
+          $('#esimTipText').textContent = esimTips[t];
         });
       });
 
-      btn.addEventListener('click', ()=>{
-        const num = input.value.trim();
-        if(!num) return;
-        if(remember.checked){
-          state.esimBalance.savedNumber = num;
+      $('#esimBalanceContinue').addEventListener('click', ()=>{
+        const num = (input.value || '').trim();
+        if(!num){
+          alert('Введите номер eSIM');
+          return;
         }
-        renderEsimBalanceView(num);
+        if(remember.checked){
+          state.esimSavedNumber = num;
+        }
+        openEsimBalanceResult(num);
       });
     }
 
-    function renderEsimBalanceView(number){
-      let latest = state.orders.find(o=>o.type==='esim');
-      if(!latest){
-        latest = {
-          country:{name:'Турция'},
-          plan:{name:'Турция 1GB 7 дней', period:7, dataGB:1}
-        };
-      }
-      const daysLeft = 3;
-      const dataLeft = latest.plan.dataGB > 0 ? (latest.plan.dataGB).toFixed(1) + ' GB' : 'Безлимит';
-
+    function openEsimBalanceResult(num){
       openSheet('Баланс eSIM', `
         <div style="padding-top:6px">
           <div class="listCard">
-            <div class="kv">
-              <div class="kvRow">
-                <div class="k">Номер eSIM</div>
-                <div class="v">${number}</div>
-              </div>
-              <div class="kvRow">
-                <div class="k">Страна</div>
-                <div class="v">${latest.country.name}</div>
-              </div>
-              <div class="kvRow">
-                <div class="k">Тариф</div>
-                <div class="v">${latest.plan.name}</div>
-              </div>
-              <div class="kvRow">
-                <div class="k">Остаток дней</div>
-                <div class="v">${daysLeft} дн.</div>
-              </div>
-              <div class="kvRow">
-                <div class="k">Остаток трафика</div>
-                <div class="v">${dataLeft}</div>
-              </div>
+            <div class="kvRow">
+              <div class="k">Номер eSIM</div>
+              <div class="v">${num}</div>
+            </div>
+            <div class="kvRow">
+              <div class="k">Страна</div>
+              <div class="v">Турция</div>
+            </div>
+            <div class="kvRow">
+              <div class="k">Остаток дней</div>
+              <div class="v">12 дней</div>
+            </div>
+            <div class="kvRow">
+              <div class="k">Остаток трафика</div>
+              <div class="v">3.5 GB</div>
             </div>
           </div>
 
-          <button class="btnPrimary" id="checkAnother" style="margin-top:12px">Проверить баланс по другой eSIM</button>
-          <div class="smallNote">В прототипе данные условные — баланс не привязан к реальному оператору.</div>
+          <div style="height:12px"></div>
+          <button class="btnPrimary" id="checkAnotherEsim">Проверить баланс по другой eSIM</button>
         </div>
+      `, `
+        <button class="bigClose" onclick="closeSheet()">Закрыть</button>
       `);
 
-      $('#checkAnother').addEventListener('click', ()=>{
-        renderEsimBalanceEnter();
+      $('#checkAnotherEsim').addEventListener('click', ()=>{
+        openEsimBalanceEnter(false);
       });
     }
 
-    // --- utils
-    function formatData(p){
-      if(p.dataGB === -1) return 'Безлимит';
-      if(p.dataGB >= 1) return p.dataGB + 'GB';
-      return (p.dataGB*1024) + 'MB';
-    }
-    function shorten(s, n){
-      if(!s) return '';
-      s = String(s);
-      return s.length>n ? s.slice(0, n-1) + '…' : s;
-    }
-
-    // init
     function tickTime(){
       const d = new Date();
       $('#time').textContent = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
-      $('#opsDate').textContent = fmtDate(d);
     }
     tickTime();
     setInterval(tickTime, 15000);
 
     renderOps();
-    renderEsimAssets();
   </script>
 </body>
 </html>
